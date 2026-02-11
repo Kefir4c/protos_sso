@@ -1,0 +1,85 @@
+syntax = "proto3";
+
+package auth;
+
+option go_package = "seomkin.sso.v1;ssov1";
+
+// Auth service provides authentication and authorization functionality
+// for user management, token validation, and role verification.
+service Auth {
+  // Register creates a new user account with the provided credentials
+  rpc Register (RegisterRequest) returns (RegisterResponse);
+
+  // Login authenticates a user and returns a JWT token for authorized access
+  rpc Login (LoginRequest) returns (LoginResponse);
+
+  // IsAdmin checks if a specific user has administrator privileges
+  rpc IsAdmin (IsAdminRequest) returns (IsAdminResponse);
+
+  // ValidateToken verifies if the provided JWT token is valid and not expired,
+  // returns user information associated with the token
+  rpc ValidateToken (ValidateTokenRequest) returns (ValidateTokenResponse);
+
+  // Logout invalidates the provided token, preventing further use
+  rpc Logout (LogoutRequest) returns (LogoutResponse);
+}
+
+// RegisterRequest contains user credentials for account creation
+message RegisterRequest {
+  string email = 1;      // User's email address, must be unique
+  string password = 2;   // User's password, will be hashed before storage
+}
+
+// RegisterResponse returns the unique identifier of the created user
+message RegisterResponse {
+  int64 user_id = 1;    // Unique user identifier generated during registration
+}
+
+// LoginRequest contains credentials for user authentication
+message LoginRequest {
+  string email = 1;     // User's registered email address
+  string password = 2;  // User's password for verification
+  int32 app_id = 3;     // Application identifier requesting the token
+}
+
+// LoginResponse returns authentication token for authorized requests
+message LoginResponse {
+  string token = 1;     // JWT token for subsequent authenticated requests
+}
+
+// IsAdminRequest specifies the user to check for admin privileges
+message IsAdminRequest {
+  int64 user_id = 1;    // User identifier to verify admin status
+}
+
+// IsAdminResponse indicates whether the user has administrator rights
+message IsAdminResponse {
+  bool is_admin = 1;    // True if user has admin privileges, false otherwise
+}
+
+// ValidateTokenRequest contains the token to verify
+message ValidateTokenRequest {
+  string token = 1;     // JWT token to validate
+}
+
+// ValidateTokenResponse returns token validation result and associated user data
+message ValidateTokenResponse {
+  bool is_valid = 1;    // True if token is valid and not expired
+  int64 user_id = 2;    // User identifier extracted from valid token
+  string email = 3;     // User email extracted from valid token
+  int32 app_id = 4;     // Application identifier extracted from valid token
+}
+
+// LogoutRequest contains the token to invalidate
+message LogoutRequest {
+  string token = 1;     // JWT token to revoke
+}
+
+// LogoutResponse confirms the token invalidation operation result
+message LogoutResponse {
+  bool success = 1;     // True if token was successfully invalidated
+}
+
+
+
+
